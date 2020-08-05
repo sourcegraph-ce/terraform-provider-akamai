@@ -64,6 +64,15 @@ func resourcePropertyActivationCreate(d *schema.ResourceData, meta interface{}) 
 		return errors.New("unable to find property")
 	}
 
+	rulesAPI, err := property.GetRules(CorrelationID)
+	if err == papi.ErrorMap[papi.ErrInvalidRules] && len(rulesAPI.Errors) > 0 {
+		var msg string
+		for _, v := range rulesAPI.Errors {
+			msg = msg + fmt.Sprintf("\n Rule validation error: %s %s %s %s %s", v.Type, v.Title, v.Detail, v.Instance, v.BehaviorName)
+		}
+		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  Error Activation Not permitted - Invalid Property Rules: %s\n", msg))
+		return errors.New("Error Activation Not permitted - Invalid Property Rules" + msg)
+	}
 	// The API now has data, so save the partial state
 	d.SetPartial("network")
 
@@ -226,6 +235,16 @@ func resourcePropertyActivationUpdate(d *schema.ResourceData, meta interface{}) 
 	e := property.GetProperty(CorrelationID)
 	if e != nil {
 		return e
+	}
+
+	rulesAPI, err := property.GetRules(CorrelationID)
+	if err == papi.ErrorMap[papi.ErrInvalidRules] && len(rulesAPI.Errors) > 0 {
+		var msg string
+		for _, v := range rulesAPI.Errors {
+			msg = msg + fmt.Sprintf("\n Rule validation error: %s %s %s %s %s", v.Type, v.Title, v.Detail, v.Instance, v.BehaviorName)
+		}
+		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  Error Activation Not permitted - Invalid Property Rules: %s\n", msg))
+		return errors.New("Error Activation Not permitted - Invalid Property Rules" + msg)
 	}
 
 	activation, err := getActivation(d, property, papi.ActivationTypeActivate, papi.NetworkValue(d.Get("network").(string)), CorrelationID)
