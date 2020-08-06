@@ -15,7 +15,7 @@ import (
 // https://developer.akamai.com/api/cloud_security/application_security/v1.html
 func resourceSelectedHostnames() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSelectedHostnamesRead,
+		Create: resourceSelectedHostnamesUpdate,
 		Read:   resourceSelectedHostnamesRead,
 		Update: resourceSelectedHostnamesUpdate,
 		Delete: resourceSelectedHostnamesDelete,
@@ -77,56 +77,3 @@ func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) e
 	return resourceSelectedHostnamesRead(d, meta)
 
 }
-
-func rrdata(
-	d *schema.ResourceData,
-) []string {
-	rrdatasCount := d.Get("hostnames.#").(int)
-	data := make([]string, rrdatasCount)
-	for i := 0; i < rrdatasCount; i++ {
-		data[i] = d.Get(fmt.Sprintf("hostnames.%d", i)).(string)
-	}
-	return data
-}
-
-func convertStringArrToInterface(strs []string) []interface{} {
-	arr := make([]interface{}, len(strs))
-	for i, str := range strs {
-		arr[i] = str
-	}
-	return arr
-}
-
-/*
-func convertStringArr(ifaceArr []interface{}) []string {
-	return convertAndMapStringArr(ifaceArr, func(s string) string { return s })
-}
-
-func convertStringArrHN(ifaceArr []interface{}) []appsec.Hostname {
-	return convertAndMapStringArrHN(ifaceArr, func(s string) string { return s })
-}
-
-func convertAndMapStringArr(ifaceArr []interface{}, f func(string) string) []string {
-	var arr []string
-	for _, v := range ifaceArr {
-		if v == nil {
-			continue
-		}
-		arr = append(arr, f(v.(string)))
-	}
-	return arr
-}
-
-func convertAndMapStringArrHN(ifaceArr []interface{}, f func(string) string) []appsec.Hostname { //[]string {
-	var arr []appsec.Hostname //[]string
-	for _, v := range ifaceArr {
-		if v == nil {
-			continue
-		}
-		//arr = append(arr, f(v.(string)))
-		arr = append(arr, f(v.(appsec.Hostname)))
-
-	}
-	return arr
-}
-*/

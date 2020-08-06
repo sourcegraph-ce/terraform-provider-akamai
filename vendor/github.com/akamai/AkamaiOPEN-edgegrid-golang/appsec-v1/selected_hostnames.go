@@ -14,26 +14,6 @@ import (
 //
 // https://developer.akamai.com/api/cloud_security/application_security/v1.html
 
-type SelectedHostnamesResponse1 struct {
-	HostnameList []struct {
-		Hostname string `json:"hostname"`
-	} `json:"hostnameList"`
-}
-
-type Recordsets struct {
-	Recordsets []Recordset `json:"recordsets"`
-}
-type Recordset struct {
-	Name  string   `json:"name"`
-	Type  string   `json:"type"`
-	TTL   int      `json:"ttl"`
-	Rdata []string `json:"rdata"`
-} //`json:"recordsets"`
-type RecordSetResponse struct {
-	//Metadata   MetadataH   `json:"metadata"`
-	Recordsets []Recordset `json:"recordsets"`
-}
-
 type SelectedHostnamesResponse struct {
 	HostnameList []Hostname `json:"hostnameList"`
 }
