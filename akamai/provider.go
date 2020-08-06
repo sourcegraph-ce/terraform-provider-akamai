@@ -12,6 +12,7 @@ import (
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
 
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/appsec-v1"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/papi-v1"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
@@ -132,6 +133,11 @@ func Provider() terraform.ResourceProvider {
 				Type:     schema.TypeString,
 				Default:  "default",
 			},
+			"appsec_section": &schema.Schema{
+				Optional: true,
+				Type:     schema.TypeString,
+				Default:  "default",
+			},
 			"property": &schema.Schema{
 				Optional: true,
 				Type:     schema.TypeSet,
@@ -147,33 +153,43 @@ func Provider() terraform.ResourceProvider {
 				Type:     schema.TypeSet,
 				Elem:     getConfigOptions("gtm"),
 			},
+			"appsec": &schema.Schema{
+				Optional: true,
+				Type:     schema.TypeSet,
+				Elem:     getConfigOptions("appsec"),
+			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"akamai_authorities_set":        dataSourceAuthoritiesSet(),
-			"akamai_contract":               dataSourcePropertyContract(),
-			"akamai_cp_code":                dataSourceCPCode(),
-			"akamai_dns_record_set":         dataSourceDNSRecordSet(),
-			"akamai_group":                  dataSourcePropertyGroups(),
-			"akamai_property_rules":         dataPropertyRules(),
-			"akamai_property":               dataSourceAkamaiProperty(),
-			"akamai_gtm_default_datacenter": dataSourceGTMDefaultDatacenter(),
+			"akamai_authorities_set":             dataSourceAuthoritiesSet(),
+			"akamai_contract":                    dataSourcePropertyContract(),
+			"akamai_cp_code":                     dataSourceCPCode(),
+			"akamai_dns_record_set":              dataSourceDNSRecordSet(),
+			"akamai_group":                       dataSourcePropertyGroups(),
+			"akamai_property_rules":              dataPropertyRules(),
+			"akamai_property":                    dataSourceAkamaiProperty(),
+			"akamai_gtm_default_datacenter":      dataSourceGTMDefaultDatacenter(),
+			"akamai_appsec_configuration":        dataSourceConfiguration(),
+			"akamai_appsec_export_configuration": dataSourceExportConfiguration(),
+			"akamai_appsec_selectable_hostnames": dataSourceSelectableHostnames(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"akamai_cp_code":             resourceCPCode(),
-			"akamai_dns_zone":            resourceDNSv2Zone(),
-			"akamai_dns_record":          resourceDNSv2Record(),
-			"akamai_edge_hostname":       resourceSecureEdgeHostName(),
-			"akamai_property":            resourceProperty(),
-			"akamai_property_rules":      resourcePropertyRules(),
-			"akamai_property_variables":  resourcePropertyVariables(),
-			"akamai_property_activation": resourcePropertyActivation(),
-			"akamai_gtm_domain":          resourceGTMv1Domain(),
-			"akamai_gtm_datacenter":      resourceGTMv1Datacenter(),
-			"akamai_gtm_property":        resourceGTMv1Property(),
-			"akamai_gtm_resource":        resourceGTMv1Resource(),
-			"akamai_gtm_cidrmap":         resourceGTMv1Cidrmap(),
-			"akamai_gtm_geomap":          resourceGTMv1Geomap(),
-			"akamai_gtm_asmap":           resourceGTMv1ASmap(),
+			"akamai_cp_code":                    resourceCPCode(),
+			"akamai_dns_zone":                   resourceDNSv2Zone(),
+			"akamai_dns_record":                 resourceDNSv2Record(),
+			"akamai_edge_hostname":              resourceSecureEdgeHostName(),
+			"akamai_property":                   resourceProperty(),
+			"akamai_property_rules":             resourcePropertyRules(),
+			"akamai_property_variables":         resourcePropertyVariables(),
+			"akamai_property_activation":        resourcePropertyActivation(),
+			"akamai_gtm_domain":                 resourceGTMv1Domain(),
+			"akamai_gtm_datacenter":             resourceGTMv1Datacenter(),
+			"akamai_gtm_property":               resourceGTMv1Property(),
+			"akamai_gtm_resource":               resourceGTMv1Resource(),
+			"akamai_gtm_cidrmap":                resourceGTMv1Cidrmap(),
+			"akamai_gtm_geomap":                 resourceGTMv1Geomap(),
+			"akamai_gtm_asmap":                  resourceGTMv1ASmap(),
+			"akamai_appsec_configuration_clone": resourceConfigurationClone(),
+			"akamai_appsec_selected_hostnames":  resourceSelectedHostnames(),
 		},
 	}
 	//ConfigureFunc: providerConfigure,
@@ -194,8 +210,9 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	dnsv2Config, dnsErr := getConfigDNSV2Service(d)
 	papiConfig, papiErr := getPAPIV1Service(d)
 	gtmConfig, gtmErr := getConfigGTMV1Service(d)
+	appsecConfig, appsecErr := getAPPSECV1Service(d)
 
-	if dnsErr != nil && papiErr != nil && gtmErr != nil || dnsv2Config == nil && papiConfig == nil && gtmConfig == nil {
+	if dnsErr != nil && papiErr != nil && gtmErr != nil && appsecErr != nil || dnsv2Config == nil && papiConfig == nil && gtmConfig == nil && appsecConfig == nil {
 		return nil, fmt.Errorf("One or more Akamai Edgegrid provider configurations must be defined")
 	}
 
@@ -321,4 +338,40 @@ func getPAPIV1Service(d resourceData) (*edgegrid.Config, error) {
 
 	papi.Init(papiConfig)
 	return &papiConfig, nil
+}
+
+func getAPPSECV1Service(d resourceData) (*edgegrid.Config, error) {
+	var appsecConfig edgegrid.Config
+	if _, ok := d.GetOk("appsec"); ok {
+		log.Printf("[DEBUG] Setting appsec config via HCL")
+		config := d.Get("appsec").(set).List()[0].(map[string]interface{})
+
+		appsecConfig = edgegrid.Config{
+			Host:         config["host"].(string),
+			AccessToken:  config["access_token"].(string),
+			ClientToken:  config["client_token"].(string),
+			ClientSecret: config["client_secret"].(string),
+			MaxBody:      config["max_body"].(int),
+		}
+
+		appsec.Init(appsecConfig)
+		return &appsecConfig, nil
+	}
+
+	var err error
+	edgerc := d.Get("edgerc").(string)
+	if section, ok := d.GetOk("appsec_section"); ok && section != "default" {
+		appsecConfig, err = edgegrid.Init(edgerc, section.(string))
+	} else if section, ok := d.GetOk("appsec_section"); ok && section != "default" {
+		appsecConfig, err = edgegrid.Init(edgerc, section.(string))
+	} else {
+		appsecConfig, err = edgegrid.Init(edgerc, "default")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	appsec.Init(appsecConfig)
+	return &appsecConfig, nil
 }
