@@ -67,58 +67,8 @@ func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) e
 	selectedhostnames := appsec.NewSelectedHostnamesResponse()
 	configid := d.Get("configid").(int)
 	version := d.Get("version").(int)
-	/*
-		v := d.Get("hostnames") //.([]interface{})
-		//m := make(map[string]string)
-		m := make([]appsec.Hostname, len(d.Get("hostnames").([]interface{})))
-		//for k, val := range v.(map[string]interface{}) {
-		//hn := &appsec.Hostname{}
-
-		for k, val := range v.(*schema.Set).List() {
-			hn := &appsec.Hostname{
-				Hostname: val.(string),
-			}
-			m[k] = hn //val.(string)
-		}*/
-	//selectedhostnames.HostnameList = m
-	//selectedhostnames = &appsec.SelectedHostnamesResponse{
-	//		HostnameList: convertStringArrToInterface(d.Get("hostnames").([]interface{})),
-	//	}
 
 	selectedhostnames.HostnameList = d.Get("hostnames").([]appsec.Hostname)
-	//hostnamelist := d.Get("hostnames").([]interface{})
-	/*hostnamelist := d.Get("hostnames")
-
-	hostnamearray := make([]*appsec.SelectedHostnamesResponse, len(hostnamelist).([]interface{}))
-
-	codes := []string{}
-	for _, code := range hostnamelist.(*schema.Set).List() {
-		codes = append(codes, code.(string))
-		hn := &appsec.Hostname{
-			Hostname: code.(string),
-		}
-		//selectedhostnames = append(selectedhostnames, codes)
-	}
-
-	hna := []*appsec.Hostname{}
-	//r.Objects = append(r.Objects, ms)
-	selectedhostnames = &appsec.SelectedHostnamesResponse{
-		HostnameList: append(hna, hna), //rrdata(d),
-	}
-	*/
-	//hostnameList := hostnamelist.(appsec.SelectedHostnamesResponse)
-	//hostnameList := make([]*appsec.SelectedHostnamesResponse, len(hostnamelist)) // create new object list
-	//hostnameList := make([]string, len(d.Get("hostnames").([]interface{})))
-	//ls := make([]string, len(hostnamelist.([]interface{})))
-	//ls := make([]string, len(hostnameList))
-	//	for i, sl := range hostnamelist.([]interface{}) {
-	//		HostnameList := []appsec.SelectedHostnamesResponse{}
-	//		ls[i] = sl.(string)
-	//	}
-	//	selectedhostnames.HostnameList = hostnameList
-
-	//hostnamelist := d.Get("hostnames").(HostnameList)
-	//selectedhostnames.HostnameList = hostnamelist.([]SelectedHostnamesResponse)
 	err := selectedhostnames.UpdateSelectedHostnames(configid, version, CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))

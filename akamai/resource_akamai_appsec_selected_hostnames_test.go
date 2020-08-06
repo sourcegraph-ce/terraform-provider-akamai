@@ -11,7 +11,7 @@ import (
 
 func TestAccAkamaiSelectedHostnames_basic(t *testing.T) {
 
-	//dataSourceName := "akamai_appsec_selected_hostnames.appsecselectedhostnames"
+	dataSourceName := "akamai_appsec_selected_hostnames.appsecselectedhostnames"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -22,7 +22,7 @@ func TestAccAkamaiSelectedHostnames_basic(t *testing.T) {
 				Config: testAccAkamaiSelectedHostnamesConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAkamaiSelectedHostnamesExists,
-					//resource.TestCheckResourceAttrSet(dataSourceName, "id"),
+					resource.TestCheckResourceAttrSet(dataSourceName, "id"),
 				),
 			},
 		},
