@@ -386,13 +386,13 @@ func unmarshalRulesFromJSONComp(d interface{}, rulesComp string, propertyRules *
 }
 
 func suppressConfigurationCloneVersion(k, old, new string, d *schema.ResourceData) bool {
-	edge.PrintfCorrelation("[DEBUG]", "DIFFSUPPRESS", fmt.Sprintf("Creating ConfigurationClone %d %d %v\n", old, new, k))
+	edge.PrintfCorrelation("[DEBUG]", "DIFFSUPPRESS", fmt.Sprintf("Creating ConfigurationClone %s %s %v\n", old, new, k))
 	if old == "" {
-		edge.PrintfCorrelation("[DEBUG]", "DIFFSUPPRESS", fmt.Sprintf("Creating ConfigurationClone OLD EMPTY  %d %d\n", old, new))
+		edge.PrintfCorrelation("[DEBUG]", "DIFFSUPPRESS", fmt.Sprintf("Creating ConfigurationClone OLD EMPTY  %s %s\n", old, new))
 		return false
 	}
 	if old < new {
-		edge.PrintfCorrelation("[DEBUG]", "DIFFSUPPRESS", fmt.Sprintf("Creating ConfigurationClone OLD < NEW  %d %d\n", old, new))
+		edge.PrintfCorrelation("[DEBUG]", "DIFFSUPPRESS", fmt.Sprintf("Creating ConfigurationClone OLD < NEW  %s %s\n", old, new))
 		return true
 	}
 
