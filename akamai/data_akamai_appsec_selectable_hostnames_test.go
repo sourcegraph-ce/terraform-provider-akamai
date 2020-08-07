@@ -32,7 +32,7 @@ provider "akamai" {
   appsec_section = "default"
 }
 
-data "akamai_appsec_config" "appsecconfigedge" {
+data "akamai_appsec_configuration" "appsecconfigedge" {
   name = "Example for EDGE"
   
 }
@@ -40,14 +40,17 @@ data "akamai_appsec_config" "appsecconfigedge" {
 
 
 output "configsedge" {
-  value = data.akamai_appsec_config.appsecconfigedge.configid
+  value = data.akamai_appsec_configuration.appsecconfigedge.configid
 }
 
 data "akamai_appsec_selectable_hostnames" "appsecselectablehostnames" {
-    configid = data.akamai_appsec_config.appsecconfigedge.configid
-    version = data.akamai_appsec_config.appsecconfigedge.latestversion   
+    configid = data.akamai_appsec_configuration.appsecconfigedge.configid
+    version = data.akamai_appsec_configuration.appsecconfigedge.latestversion   
 }
 
+output "selectablehostnames" {
+  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.hostnames
+}
 
 `
 }

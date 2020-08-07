@@ -22,6 +22,11 @@ func dataSourceSelectableHostnames() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"hostnames": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "JSON List of hostnames",
+			},
 		},
 	}
 }
@@ -49,8 +54,7 @@ func dataSourceSelectableHostnamesRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	d.Set("json", string(jsonBody))
-
+	d.Set("hostnames", string(jsonBody))
 	d.SetId(strconv.Itoa(selectablehostnames.ConfigID))
 
 	return nil
