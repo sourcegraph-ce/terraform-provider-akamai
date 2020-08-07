@@ -32,7 +32,7 @@ func TestAccAkamaiSelectedHostnames_basic(t *testing.T) {
 func testAccAkamaiSelectedHostnamesConfig() string {
 	return `
 provider "akamai" {
-  appsec_section = "global"
+  appsec_section = "default"
 }
 
 data "akamai_appsec_configuration" "appsecconfigedge" {
@@ -49,7 +49,7 @@ output "configsedge" {
 resource "akamai_appsec_selected_hostnames" "appsecselectedhostnames" {
     configid = data.akamai_appsec_configuration.appsecconfigedge.configid
     version = data.akamai_appsec_configuration.appsecconfigedge.latestversion 
-    hostnames = ["*.example.net","example.com","m.example.com"]  
+    hostnames = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"]  
 }
 
 

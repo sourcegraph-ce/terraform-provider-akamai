@@ -67,12 +67,21 @@ func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) e
 	selectedhostnames := appsec.NewSelectedHostnamesResponse()
 	configid := d.Get("configid").(int)
 	version := d.Get("version").(int)
+	hn := &appsec.SelectedHostnamesResponse{}
 
-	selectedhostnames.HostnameList = d.Get("hostnames").([]appsec.Hostname)
+	hostnamelist := d.Get("hostnames").([]interface{})
+
+	for _, h := range hostnamelist {
+		m := appsec.Hostname{}
+		m.Hostname = h.(string)
+		hn.HostnameList = append(hn.HostnameList, m)
+	}
+
+	selectedhostnames.HostnameList = hn.HostnameList
 	err := selectedhostnames.UpdateSelectedHostnames(configid, version, CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
-		return nil
+		return err
 	}
 	return resourceSelectedHostnamesRead(d, meta)
 
