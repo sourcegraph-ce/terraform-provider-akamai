@@ -160,7 +160,7 @@ func (exportconfiguration *ExportConfigurationResponse) GetExportConfiguration(c
 		Config,
 		"GET",
 		fmt.Sprintf(
-			"/appsec/v1/export/configs/%s/versions/%s",
+			"/appsec/v1/export/configs/%d/versions/%d",
 			exportconfiguration.ConfigID,
 			exportconfiguration.Version,
 		),
