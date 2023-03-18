@@ -24,7 +24,7 @@ import (
 	"os"
 	"strings"
 
-	logstd "log"
+	logstd log "github.com/sourcegraph-ce/logrus"
 
 	log "github.com/sirupsen/logrus"
 )

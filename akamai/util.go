@@ -4,7 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
-	"log"
+	log "github.com/sourcegraph-ce/logrus"
 	"os"
 	"reflect"
 	"time"
