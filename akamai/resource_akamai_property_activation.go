@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	log "github.com/sourcegraph-ce/logrus"
 	"time"
 
 	edge "github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"

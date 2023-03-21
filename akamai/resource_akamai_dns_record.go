@@ -7,7 +7,7 @@ import (
 	dnsv2 "github.com/akamai/AkamaiOPEN-edgegrid-golang/configdns-v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
+	log "github.com/sourcegraph-ce/logrus"
 	"net"
 	"regexp"
 	"sort"

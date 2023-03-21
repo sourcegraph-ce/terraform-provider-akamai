@@ -5,7 +5,7 @@ import (
 	"fmt"
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
+	log "github.com/sourcegraph-ce/logrus"
 	"strconv"
 	"strings"
 	"sync"
